@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using NuGet.ProjectModel;
 
@@ -9,7 +10,15 @@ namespace AnalyzeDotNetProject
         static void Main(string[] args)
         {
             // Replace to point to your project or solution
-            string projectPath = @"c:\development\jerriep\dotnet-outdated\DotNetOutdated.sln";
+            if (args.Length < 1) {
+              throw new ArgumentException("must provide a solution file to operate on");
+            }
+            var solutionFile = new FileInfo(args[0]);
+            if (solutionFile.Exists == false) {
+              throw new ArgumentException($"cannot find {solutionFile.FullName}");
+            }
+
+            string projectPath = solutionFile.FullName;
 
             var dependencyGraphService = new DependencyGraphService();
             var dependencyGraph = dependencyGraphService.GenerateDependencyGraph(projectPath);
