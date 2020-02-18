@@ -52,13 +52,22 @@ namespace AnalyzeDotNetProject
         private static void ReportDependency(LockFileTargetLibrary projectLibrary, LockFileTarget lockFileTargetFramework, int indentLevel)
         {
             Console.Write(new String(' ', indentLevel * 2));
+            if (projectLibrary == null) {
+              Console.WriteLine("projectLibrary is <null>");
+              return;
+            }
             Console.WriteLine($"{projectLibrary.Name}, v{projectLibrary.Version}");
 
             foreach (var childDependency in projectLibrary.Dependencies)
             {
                 var childLibrary = lockFileTargetFramework.Libraries.FirstOrDefault(library => library.Name == childDependency.Id);
 
-                ReportDependency(childLibrary, lockFileTargetFramework, indentLevel + 1);
+                if (childLibrary != null) {
+                  ReportDependency(childLibrary, lockFileTargetFramework, indentLevel + 1);
+                } else {
+                  Console.Write(new String(' ', (indentLevel+1*2)));
+                  Console.WriteLine($"Could not find a childLibrary for {childDependency.Id} in: {String.Join(",", lockFileTargetFramework.Libraries.Select(l => l.Name))}");
+                }
             }
         }
     }
